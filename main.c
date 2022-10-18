@@ -16,6 +16,7 @@ int __attribute((noreturn)) main(void) {
 	GPIOC->CRH &= ~GPIO_CRH_CNF13; //clear cnf bits
 	GPIOC->CRH |= GPIO_CRH_MODE13_0; //Max speed = 10Mhz
 
+	//CHANGE FREQ TO 24kHz
     while (1) {
 	    GPIOC->ODR |= (1U<<13U); //U -- unsigned suffix (to avoid syntax warnings in IDE)
 		delay(1000000);
