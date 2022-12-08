@@ -8,7 +8,18 @@ void delay(uint32_t ticks) {
 	}
 }
 
-uint8_t LCD_Buf[8][128] = {0xFF, 0xFF};
+uint8_t LCD_Buf[8][128] = {0};
+//memset()
+
+uint8_t GameField[16][32];
+
+void DrawPixel(uint8_t x, uint8_t y);
+
+void drawCell(int x, int y, int size) {
+  for (int i=0; i<size; i++)
+    for (int j=0; j<size; j++)
+      DrawPixel((uint8_t) (x*size + i), (uint8_t) (y*size + j));
+}
 
 void SPI1_Init(void)
 {
@@ -122,7 +133,6 @@ void DrawPixel(uint8_t x, uint8_t y){ // x in [0..63], y in [0..127]
   uint8_t column=LCD_Buf[page_address][y];
   //set pixel value in LCD_buf
   column |= (1<< (x%8));
-
   dat(column);
   LCD_Buf[page_address][y] = column;
 }
@@ -142,7 +152,7 @@ void DrawChess(){
 }
 
 int main(void) {
-
+  
 
 	// Enable clock for GPIOC
 	RCC->APB2ENR |= RCC_APB2ENR_IOPCEN;
@@ -165,7 +175,7 @@ int main(void) {
   cmd(0xA6); // Normal color, A7 = inverse color
   cmd(0xAF); // Display on
   cmd(0x40 | 0x00); // Set start line address (Lines 0x00...0x3F)
-  //memset(LCD_Buf, 0, sizeof(int8_t) * 8 * 128);
+  memset(LCD_Buf, 0, sizeof(int8_t) * 8 * 128);
   for(int k=0; k<=7; k++){ // Clear DRAM
     cmd(0xB0 | k); // Set Page 0 (Pages 0x00...0x0F)
     for(int i=0; i<=127; i++){
@@ -185,25 +195,19 @@ int main(void) {
   //  for(int j=0; j<64; j++)
   //    DrawPixel(i,j);
  
- //DrawPixel(10,10);
- //DrawPixel(10,20);
- //DrawPixel(12,10);
+  DrawPixel(10,10);
+  //DrawPixel(10,20);
+  DrawPixel(12,10);
+  DrawPixel(14,10);
+  DrawPixel(16,10);
   //DrawChess();
   
   //delay(10000000);
   //cmd(0x40 | 0x01); // Set start line address (Lines 0x00...0x3F)
   
-    while (1) { // LED blinking
-	    GPIOC->ODR |= (1U<<13U); //U -- unsigned suffix (to avoid syntax warnings in IDE)
-		delay(1000000);
-	    GPIOC->ODR &= ~(1U<<13U);
-      const char test[] = "HELLO";
-      for(int i=0; i<strlen(test); i++){
-        while(!(USART3->SR & USART_SR_TXE));
-        USART3->DR = test[i];
-      }
-
-      //SART3->DR = 'D';
-	    delay(1000000);
-    }
+  //drawCell(4, 5, 2);
+  while (1) {
+    //SART3->DR = 'D';
+	  delay(1000000);
+  }
 }
